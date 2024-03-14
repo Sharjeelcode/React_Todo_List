@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 function App() {
   const [input, setinput] = useState("")
   const [todo, settodo] = useState([])
   const [empty, setempty] = useState("hidden")
 
-  useEffect(() => {
+  // useEffect(() => {
 
-  }, [todo])
+  // }, [todo])
 
 
   const handleAddTodo = () => {
@@ -18,13 +18,14 @@ function App() {
       setempty("hidden")
       settodo([...todo, input]);
       setinput("");
-      console.log(todo);
     }
   };
 
-  const handleDelete = (e) => {
-    console.log(e.target.inneHTML);
-  }
+  const handleDelete = (index) => {
+    const newTodo = [...todo]; 
+    newTodo.splice(index, 1); 
+    settodo(newTodo);
+  };
 
   return (
     <>
@@ -71,7 +72,9 @@ function App() {
                     </p>
                     <button
                       className="bg-blue-500 px-2 font-extrabold text-white "
-                      onClick={handleDelete}
+                      onClick={()=>{
+                        handleDelete(index)
+                      }}
                     >
                       X
                     </button>
