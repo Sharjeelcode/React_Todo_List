@@ -21,11 +21,25 @@ function App() {
     }
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = (index ) => {
     const newTodo = [...todo]; 
     newTodo.splice(index, 1); 
     settodo(newTodo);
   };
+
+  const handleUpdate = (index , e)=>{
+    const updateTodo = [...todo];
+    if (e === "✏️") {
+      e = "✅"
+      setinput(updateTodo[index])
+    }else{
+      updateTodo[index] = input
+      settodo(updateTodo)
+      e = "✏️"
+      setinput("")
+    }
+
+  }
 
   return (
     <>
@@ -41,7 +55,7 @@ function App() {
             Todo List
           </h1>
           <div
-            className="flex "
+            className="flex bg-white"
           >
             <input
               type="text"
@@ -50,10 +64,10 @@ function App() {
               onChange={(e) => setinput(e.target.value)}
             />
             <button
-              className="bg-red-800 px-2 font-extrabold text-lg text-white "
+              className="bg-white rounded px-2 font-extrabold text-lg text-white "
               onClick={handleAddTodo}
             >
-              +
+             ➕
             </button>
           </div>
           <p className={empty}>Enter Something to Display</p>
@@ -71,12 +85,20 @@ function App() {
                       {list}
                     </p>
                     <button
-                      className="bg-blue-500 px-2 font-extrabold text-white "
-                      onClick={()=>{
-                        handleDelete(index)
+                      className=" px-2 font-extrabold text-white "
+                      onClick={(e)=>{
+                        handleUpdate(index, e.target.value)
                       }}
                     >
-                      X
+                      ✏️
+                    </button>
+                    <button
+                      className="px-2 font-extrabold text-white "
+                      onClick={()=>{
+                        handleDelete(index )
+                      }}
+                    >
+                      ❌
                     </button>
                   </div>
                 </>
