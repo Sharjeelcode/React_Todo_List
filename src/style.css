@@ -2,10 +2,10 @@
     font-family: "Poppins";
 }
 body{
-    background: rgb(238,174,202);
-background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(37,126,231,1) 100%);
+    background: rgb(123,208,213);
+background: radial-gradient(circle, rgba(123,208,213,1) 0%, rgba(148,187,233,1) 100%);
 }
 #todo_div{
-    background-color: rgba(255, 255, 255, 0.283);
+    background-color: rgba(255, 255, 255, 0.162);
     backdrop-filter: blur(5px);
 }

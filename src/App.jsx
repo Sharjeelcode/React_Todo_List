@@ -1,46 +1,72 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import todoLogo from './assets/icon.png'
 
 function App() {
   const [input, setinput] = useState("")
   const [todo, settodo] = useState([])
   const [empty, setempty] = useState("hidden")
-  const [icon , seticon] = useState("➕")
-  const [index,setindex] = useState()
+  const [icon, seticon] = useState("➕")
+  const [index, setindex] = useState()
+
+  useEffect(() => {
+    let storedTodo = localStorage.getItem('todos') 
+    if (storedTodo) {
+      settodo(JSON.parse(storedTodo)) 
+    }
+  }, [])
+
+  useEffect(() => {
+    setTimeout(()=>{
+      localStorage.setItem('todos', JSON.stringify(todo));
+    },100)
+  }, [todo]);
 
   const handleAddTodo = () => {
     if (input == "") {
       setempty("block text-red-500")
-    }
-    if (icon === "➕")  {
+    } else if (icon === "➕") {
       setempty("hidden")
-      settodo([...todo, input]);
+      settodo(prevTodo => [...prevTodo, input]);
       setinput("");
-    }if (icon === "✅"){
-      const newTodo = [...todo] 
-      newTodo.splice(index,1,input)
+      updateLocalStorage();
+    } if (icon === "✅") {
+      const newTodo = [...todo]
+      newTodo.splice(index, 1, input)
       settodo(newTodo)
       seticon("➕")
       setinput("")
+      updateLocalStorage()
     }
   };
 
-  const handleDelete = (index ) => {
-    const newTodo = [...todo]; 
-    newTodo.splice(index, 1); 
+  const handleDelete = (index) => {
+    const newTodo = [...todo];
+    newTodo.splice(index, 1);
     settodo(newTodo);
+    updateLocalStorage()
   };
 
-  const handleUpdate = (index)=>{
-    const updateTodo = [...todo];
+  const handleUpdate = (index) => {
     if (icon === "➕") {
+      setempty("hidden")
       seticon("✅")
-      setinput(updateTodo[index])
-    }else{
+      setinput(todo[index])
+      setindex(index)
+    } else {
+      const updateTodo = [...todo];
       updateTodo[index] = input
       settodo(updateTodo)
+      setempty("hidden")
       setinput("")
+      seticon("➕")
+      setindex(null);
+      updateLocalStorage()
     }
   }
+  const updateLocalStorage = () => {
+    localStorage.setItem('todos', JSON.stringify(todo))
+  }
+
 
   return (
     <>
@@ -49,14 +75,23 @@ function App() {
       >
         <div
           id="todo_div"
-          className="min-h-32 min-w-96 rounded flex flex-col px-4 mb-4 py-2"
+          className="min-h-32 md:min-w-96 rounded flex flex-col px-4 mb-4 py-2"
         >
-          <h1
-            className="text-center mt-4 font-bold text-2xl">
-            To-Do's
-          </h1>
           <div
-            className="flex bg-white"
+            className="flex items-center justify-center"
+          >
+            <span
+              className=" font-bold text-2xl pr-2"
+            >
+              To-Do's
+            </span>
+            <img
+              src={todoLogo}
+              className="w-16"
+            />
+          </div>
+          <div
+            className="flex bg-white rounded shadow-lg"
           >
             <input
               type="text"
@@ -65,10 +100,10 @@ function App() {
               onChange={(e) => setinput(e.target.value)}
             />
             <button
-              className="bg-white rounded px-2 font-extrabold text-lg text-white "
+              className="bg-black rounded px-2 font-extrabold text-lg text-white "
               onClick={handleAddTodo}
             >
-             {icon}
+              {icon}
             </button>
           </div>
           <p className={empty}>Enter Something to Display</p>
@@ -77,17 +112,17 @@ function App() {
               todo.map((list, index) => (
                 <>
                   <div
-                    className="flex bg-gray-100 mt-1 mb-1 rounded"
+                    className="flex bg-none shadow-lg mt-1 mb-1 rounded"
                   >
                     <p
                       key={index}
-                      className=" py-1 px-2 w-full "
+                      className=" py-1 px-2 w-full"
                     >
                       {list}
                     </p>
                     <button
                       className=" px-2 font-extrabold text-white "
-                      onClick={()=>{
+                      onClick={() => {
                         handleUpdate(index)
                         setindex(index)
                       }}
@@ -96,7 +131,7 @@ function App() {
                     </button>
                     <button
                       className="px-2 font-extrabold text-white "
-                      onClick={()=>{
+                      onClick={() => {
                         handleDelete(index)
                       }}
                     >
