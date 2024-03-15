@@ -4,20 +4,23 @@ function App() {
   const [input, setinput] = useState("")
   const [todo, settodo] = useState([])
   const [empty, setempty] = useState("hidden")
-
-  // useEffect(() => {
-
-  // }, [todo])
-
+  const [icon , seticon] = useState("➕")
+  const [index,setindex] = useState()
 
   const handleAddTodo = () => {
     if (input == "") {
       setempty("block text-red-500")
     }
-    else {
+    if (icon === "➕")  {
       setempty("hidden")
       settodo([...todo, input]);
       setinput("");
+    }if (icon === "✅"){
+      const newTodo = [...todo] 
+      newTodo.splice(index,1,input)
+      settodo(newTodo)
+      seticon("➕")
+      setinput("")
     }
   };
 
@@ -27,18 +30,16 @@ function App() {
     settodo(newTodo);
   };
 
-  const handleUpdate = (index , e)=>{
+  const handleUpdate = (index)=>{
     const updateTodo = [...todo];
-    if (e === "✏️") {
-      e = "✅"
+    if (icon === "➕") {
+      seticon("✅")
       setinput(updateTodo[index])
     }else{
       updateTodo[index] = input
       settodo(updateTodo)
-      e = "✏️"
       setinput("")
     }
-
   }
 
   return (
@@ -52,7 +53,7 @@ function App() {
         >
           <h1
             className="text-center mt-4 font-bold text-2xl">
-            Todo List
+            To-Do's
           </h1>
           <div
             className="flex bg-white"
@@ -67,7 +68,7 @@ function App() {
               className="bg-white rounded px-2 font-extrabold text-lg text-white "
               onClick={handleAddTodo}
             >
-             ➕
+             {icon}
             </button>
           </div>
           <p className={empty}>Enter Something to Display</p>
@@ -86,8 +87,9 @@ function App() {
                     </p>
                     <button
                       className=" px-2 font-extrabold text-white "
-                      onClick={(e)=>{
-                        handleUpdate(index, e.target.value)
+                      onClick={()=>{
+                        handleUpdate(index)
+                        setindex(index)
                       }}
                     >
                       ✏️
@@ -95,7 +97,7 @@ function App() {
                     <button
                       className="px-2 font-extrabold text-white "
                       onClick={()=>{
-                        handleDelete(index )
+                        handleDelete(index)
                       }}
                     >
                       ❌
@@ -104,7 +106,6 @@ function App() {
                 </>
               ))
             }
-
           </div>
         </div>
       </div>
