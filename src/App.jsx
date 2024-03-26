@@ -1,27 +1,47 @@
 import { useEffect, useState } from "react"
 import todoLogo from './assets/icon.png'
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { auth, database, storage } from "./Firebase/Firebaseconfig";
+import { addDoc, collection, getDocs  } from "firebase/firestore";
 function App() {
+  const navigate = useNavigate()
+  const [activeUserName, setActiveUserName] = useState("")
+  const [userImg, setUserImg] = useState("")
+  const [email , setemail] = useState()
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.uid === auth.currentUser.uid) {
+        setActiveUserName(auth.currentUser.displayName.toLocaleUpperCase())
+        setUserImg(auth.currentUser.photoURL)
+        setemail(auth.currentUser.email)
+      } else {
+        navigate('/signin');
+      }
+    });
+  }, []);
+
+
   const [input, setinput] = useState("")
   const [todo, settodo] = useState([])
   const [empty, setempty] = useState("hidden")
   const [icon, seticon] = useState("➕")
   const [index, setindex] = useState()
-
   useEffect(() => {
-    let storedTodo = localStorage.getItem('todos') 
+    let storedTodo = localStorage.getItem('todos')
     if (storedTodo) {
-      settodo(JSON.parse(storedTodo)) 
+      settodo(JSON.parse(storedTodo))
     }
   }, [])
 
   useEffect(() => {
-    setTimeout(()=>{
+    setTimeout(() => {
       localStorage.setItem('todos', JSON.stringify(todo));
-    },100)
+    }, 100)
   }, [todo]);
 
-  const handleAddTodo = () => {
+  const handleAddTodo = async() => {
     if (input == "") {
       setempty("block text-red-500")
     } else if (icon === "➕") {
@@ -36,6 +56,16 @@ function App() {
       seticon("➕")
       setinput("")
       updateLocalStorage()
+    }
+
+    try {
+      const docRef = await addDoc(collection(database, email),{
+        todovalue : input
+      })
+      console.log("doc  id", docRef.id);
+    }
+     catch (error) {
+      console.log(error);
     }
   };
 
@@ -67,9 +97,24 @@ function App() {
     localStorage.setItem('todos', JSON.stringify(todo))
   }
 
+  const querySnapshot = async()=>{
+  const querySnapshot =   await getDocs(collection(database, email));
+    // querySnapshot.forEach((doc) => {
+    // console.log(`${doc.id} => ${doc.data()}`);
+    // });
+  console.log(querySnapshot);
+  }
+
+  querySnapshot()
+
+
 
   return (
     <>
+      <div className="flex items-center justify-end mx-4 my-2 ">
+        <h1 className="px-2">{activeUserName}</h1>
+        <img src={userImg} className="w-12 rounded-full" />
+      </div>
       <div
         className="flex justify-center  items-center mt-10 "
       >
@@ -112,10 +157,10 @@ function App() {
               todo.map((list, index) => (
                 <>
                   <div
+                    key={index}
                     className="flex bg-none shadow-lg mt-1 mb-1 rounded"
                   >
                     <p
-                      key={index}
                       className=" py-1 px-2 w-full"
                     >
                       {list}
